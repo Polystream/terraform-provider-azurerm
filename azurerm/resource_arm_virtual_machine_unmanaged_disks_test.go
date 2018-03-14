@@ -1022,7 +1022,7 @@ resource "azurerm_virtual_machine" "test" {
     resource_group_name   = "${azurerm_resource_group.test.name}"
     network_interface_ids = ["${azurerm_network_interface.test.id}"]
 
-    vm_size = "Standard_D1_v2"
+    vm_size = "Standard_M64s"
 
     storage_image_reference {
 		publisher = "Canonical"
