@@ -32,6 +32,16 @@ func resourceArmVirtualMachine() *schema.Resource {
 				ForceNew: true,
 			},
 
+			"power_state": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"running",
+					"deallocated",
+				}, true),
+				DiffSuppressFunc: ignoreCaseDiffSuppressFunc,
+			},
+
 			"location": locationSchema(),
 
 			"resource_group_name": resourceGroupNameSchema(),
@@ -607,6 +617,30 @@ func resourceArmVirtualMachineCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
+	if v, ok := d.GetOk("power_state"); ok {
+		if v == "deallocated" {
+			future, err := client.Deallocate(ctx, resGroup, name)
+			if err != nil {
+				return err
+			}
+
+			err = future.WaitForCompletion(ctx, client.Client)
+			if err != nil {
+				return err
+			}
+		} else {
+			future, err := client.Start(ctx, resGroup, name)
+			if err != nil {
+				return err
+			}
+
+			err = future.WaitForCompletion(ctx, client.Client)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	read, err := client.Get(ctx, resGroup, name, "")
 	if err != nil {
 		return err
@@ -641,9 +675,17 @@ func resourceArmVirtualMachineRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error making Read request on Azure Virtual Machine %s: %+v", name, err)
 	}
 
+	inst, err := vmClient.InstanceView(ctx, resGroup, name)
+	powerState := strings.Split(*(*inst.Statuses)[1].Code, "/")[1]
+	if powerState != "deallocated" {
+		powerState = "running"
+	}
+
 	d.Set("name", resp.Name)
 	d.Set("resource_group_name", resGroup)
 	d.Set("zones", resp.Zones)
+	d.Set("power_state", powerState)
+
 	if location := resp.Location; location != nil {
 		d.Set("location", azureRMNormalizeLocation(*location))
 	}
