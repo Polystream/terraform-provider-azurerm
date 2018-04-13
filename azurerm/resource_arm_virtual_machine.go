@@ -40,6 +40,7 @@ func resourceArmVirtualMachine() *schema.Resource {
 					"deallocated",
 				}, true),
 				DiffSuppressFunc: ignoreCaseDiffSuppressFunc,
+				Default: "running",
 			},
 
 			"location": locationSchema(),
