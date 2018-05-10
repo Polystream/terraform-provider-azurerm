@@ -652,7 +652,7 @@ func resourceArmVirtualMachineCreate(d *schema.ResourceData, meta interface{}) e
 				return err
 			}
 
-			return fmt.Errorf("Cannot continue because Virtual Machine %s (resource group %s) is deallocated", name, resGroup)
+			return nil
 		}
 	}
 
