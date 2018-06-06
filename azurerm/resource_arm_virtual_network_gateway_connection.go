@@ -28,11 +28,7 @@ func resourceArmVirtualNetworkGatewayConnection() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"resource_group_name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
+			"resource_group_name": resourceGroupNameSchema(),
 
 			"location": locationSchema(),
 
@@ -55,8 +51,9 @@ func resourceArmVirtualNetworkGatewayConnection() *schema.Resource {
 			},
 
 			"authorization_key": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 			},
 
 			"express_route_circuit_id": {
