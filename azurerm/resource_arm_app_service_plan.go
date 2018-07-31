@@ -5,7 +5,7 @@ import (
 	"log"
 	"regexp"
 
-	"github.com/Azure/azure-sdk-for-go/services/web/mgmt/2016-09-01/web"
+	"github.com/Azure/azure-sdk-for-go/services/web/mgmt/2018-02-01/web"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/utils"
@@ -136,7 +136,7 @@ func resourceArmAppServicePlanCreateUpdate(d *schema.ResourceData, meta interfac
 		return err
 	}
 
-	err = createFuture.WaitForCompletion(ctx, client.Client)
+	err = createFuture.WaitForCompletionRef(ctx, client.Client)
 	if err != nil {
 		return err
 	}
@@ -267,9 +267,7 @@ func flattenAppServicePlanSku(profile *web.SkuDescription) []interface{} {
 
 func expandAppServicePlanProperties(d *schema.ResourceData, name string) *web.AppServicePlanProperties {
 	configs := d.Get("properties").([]interface{})
-	properties := web.AppServicePlanProperties{
-		Name: &name,
-	}
+	properties := web.AppServicePlanProperties{}
 	if len(configs) == 0 {
 		return &properties
 	}
@@ -314,8 +312,8 @@ func flattenAppServiceProperties(props *web.AppServicePlanProperties) []interfac
 func validateAppServicePlanName(v interface{}, k string) (ws []string, es []error) {
 	value := v.(string)
 
-	if matched := regexp.MustCompile(`^[0-9a-zA-Z-]+$`).Match([]byte(value)); !matched {
-		es = append(es, fmt.Errorf("%q may only contain alphanumeric characters and dashes", k))
+	if matched := regexp.MustCompile(`^[0-9a-zA-Z-_]{1,60}$`).Match([]byte(value)); !matched {
+		es = append(es, fmt.Errorf("%q may only contain alphanumeric characters, dashes and underscores up to 60 characters in length", k))
 	}
 
 	return

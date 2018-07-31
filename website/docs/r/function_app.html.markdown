@@ -111,6 +111,8 @@ The following arguments are supported:
 
 * `site_config` - (Optional) A `site_config` object as defined below.
 
+* `identity` - (Optional) An `identity` block as defined below.
+
 * `tags` - (Optional) A mapping of tags to assign to the resource.
 
 ---
@@ -132,6 +134,13 @@ The following arguments are supported:
 
 * `websockets_enabled` - (Optional) Should WebSockets be enabled?
 
+---
+
+`identity` supports the following:
+
+* `type` - (Required) Specifies the identity type of the App Service. At this time the only allowed value is `SystemAssigned`.
+
+
 ## Attributes Reference
 
 The following attributes are exported:
@@ -141,6 +150,25 @@ The following attributes are exported:
 * `default_hostname` - The default hostname associated with the Function App - such as `mysite.azurewebsites.net`
 
 * `outbound_ip_addresses` - A comma separated list of outbound IP addresses - such as `52.23.25.3,52.143.43.12`
+
+* `identity` - An `identity` block as defined below, which contains the Managed Service Identity information for this App Service.
+
+* `site_credential` - A `site_credential` block as defined below, which contains the site-level credentials used to publish to this App Service.
+
+---
+
+`identity` exports the following:
+
+* `principal_id` - The Principal ID for the Service Principal associated with the Managed Service Identity of this App Service.
+
+* `tenant_id` - The Tenant ID for the Service Principal associated with the Managed Service Identity of this App Service.
+
+
+`site_credential` exports the following:
+
+* `username` - The username which can be used to publish to this App Service
+* `password` - The password associated with the username, which can be used to publish to this App Service.
+
 
 ## Import
 
